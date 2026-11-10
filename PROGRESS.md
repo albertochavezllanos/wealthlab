@@ -25,8 +25,14 @@ never fabricate data; no fake buttons; keys only in `.env.local` and Vercel; end
 - [ ] Stage 7 — Deliverables (feature list, demo script, role statement)
 
 ## Deployment
-- GitHub: (pending)
-- Vercel: (pending)
+- GitHub: (pending — waiting for the user's repo URL)
+- Vercel: **https://wealthlab-theta.vercel.app** (project `wealthlab`, production). Deployed via CLI:
+  read `VERCEL_TOKEN` from `.env.local` and run `npx vercel@latest deploy --prod --yes --token <token>`.
+  Production env vars set (as Secrets): DEMO_PASSCODE, TIINGO_API_KEY, SEC_CONTACT_EMAIL.
+  Add ANTHROPIC_API_KEY later with `vercel env add ANTHROPIC_API_KEY --environment production --value ... --yes --token ...`.
 
 ## Notes for the next session
-- (none yet)
+- Git is at `C:\Program Files\Git\cmd\git.exe` (may not be on PATH in older shells).
+- The user found Notepad editing confusing: give ONE step at a time. They replaced whole lines
+  (dropping the `KEY=` labels); check `.env.local` structure with value-hiding scripts, never print values.
+- `vercel link` appended VERCEL_OIDC_TOKEN to `.env.local` and junk to `.gitignore` (cleaned up).

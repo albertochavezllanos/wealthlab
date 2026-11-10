@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "wealthlab-test",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "set DEMO_PASSCODE=localtest123&& npm run start -- -p 3100"],
+      "port": 3100
+    }
+  ]
+}

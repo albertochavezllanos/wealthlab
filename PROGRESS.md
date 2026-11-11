@@ -17,7 +17,13 @@ never fabricate data; no fake buttons; keys only in `.env.local` and Vercel; end
 - [x] **Stage 1 — Foundation**: layout, header (with disclaimer strip) + mobile menu, footer, home page,
   passcode screen (`/access`, `/api/access`, `src/proxy.ts`), placeholder pages for Invest / Time Machine /
   Intelligence / Methodology (honest "in development" cards, no fake controls).
-- [ ] Stage 2 — Invest
+- [x] **Stage 2 — Invest** (`/invest`, tabs via `#research|simulator|waiting|compare|portfolio`):
+  ticker search (Tiingo search + curated crypto list in `src/lib/server/tiingo.ts`), quote + split-adjusted
+  chart + stats; growth simulator (`src/lib/growth.ts`, tested vs Excel FV: `npm test`); cost of waiting;
+  strategy comparison; portfolio builder (monthly-rebalanced backtest vs SPY, vol/drawdown/correlation/
+  concentration in `src/lib/metrics.ts`); browser-only saved scenarios + portfolios (`src/lib/client/storage.ts`).
+  Data: `/api/history?ticker=` returns compact rows `[date, rawClose, adjClose, divCash, splitFactor]`,
+  cached in memory 6h + CDN `s-maxage`. `/api/search?q=`.
 - [ ] Stage 3 — Time Machine
 - [ ] Stage 4 — Intelligence core
 - [ ] Stage 5 — Market Pulse + Future Themes Lab

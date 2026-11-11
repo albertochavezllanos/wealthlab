@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Container, InProgress, PageHeader } from "@/components/ui";
+import { PageHeader } from "@/components/ui";
+import { InvestApp } from "@/components/invest/InvestApp";
 
 export const metadata: Metadata = { title: "Invest" };
 
@@ -9,21 +10,9 @@ export default function InvestPage() {
       <PageHeader
         eyebrow="WealthLab Invest"
         title="See where today's choices could lead."
-        description="Look up real investments, then project growth under assumptions you control. Every projection is an assumption, not a prediction."
+        description="Look up real investments with end-of-day prices, then project growth under assumptions you control. Projections are assumptions, not predictions."
       />
-      <Container className="py-12">
-        <InProgress
-          title="Invest tools"
-          items={[
-            "Search stocks, ETFs, funds, and crypto with end-of-day prices",
-            "Future growth simulator with a year-by-year table",
-            "Inflation-adjusted view in today's dollars",
-            "Cost of Waiting comparison",
-            "Portfolio builder with allocation weights",
-            "Side-by-side strategy comparisons and saved scenarios",
-          ]}
-        />
-      </Container>
+      <InvestApp />
     </>
   );
 }

@@ -45,7 +45,13 @@ never fabricate data; no fake buttons; keys only in `.env.local` and Vercel; end
   Spend guard: 40 AI calls/hour/instance. Caching: in-memory `memo` + Vercel CDN `s-maxage` on GET routes.
 - GOTCHAS: (1) every data API route must `await connection()` or Next prerenders it at BUILD time (this burned the
   Tiingo hourly limit once). (2) Don't use `"use cache"` around code that throws DataError — the error class is lost.
-  (3) Tiingo free plan = 50 requests/hour, shared by local testing and production.
+  (3) Tiingo: user upgraded to Power ($30/mo, 10,000 req/hr) on Nov 10 at 9:35 p.m.
+  (4) Vercel's CDN does NOT reliably keep large /api/history responses, so prices are also shipped as
+  snapshots in `data/eod/<TICKER>.json` (100 built-in tickers; `node scripts/snapshot.ts` refreshes them,
+  skips files already saved today). `sharedHistory()` in tiingo.ts serves a snapshot when its lastDate is the
+  latest expected close, else asks Tiingo, falling back to the snapshot. Search answers built-in names locally.
+- [x] Stage 6 — live tests pass; mobile layouts fixed (grid-cols-1 + body overflow-x: clip).
+- [x] Stage 7 — `DEMO.md` (75-sec script, features, verified accuracy, limits, role statement).
 - [ ] Stage 6 — Testing and final deploy
 - [ ] Stage 7 — Deliverables (feature list, demo script, role statement)
 

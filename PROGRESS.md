@@ -25,7 +25,8 @@ never fabricate data; no fake buttons; keys only in `.env.local` and Vercel; end
 - [ ] Stage 7 — Deliverables (feature list, demo script, role statement)
 
 ## Deployment
-- GitHub: (pending — waiting for the user's repo URL)
+- GitHub: **https://github.com/albertochavezllanos/wealthlab** (private). Push with
+  `& "C:\Program Files\Git\cmd\git.exe" push` (credentials cached by Git Credential Manager).
 - Vercel: **https://wealthlab-theta.vercel.app** (project `wealthlab`, production). Deployed via CLI:
   read `VERCEL_TOKEN` from `.env.local` and run `npx vercel@latest deploy --prod --yes --token <token>`.
   Production env vars set (as Secrets): DEMO_PASSCODE, TIINGO_API_KEY, SEC_CONTACT_EMAIL.

@@ -1,4 +1,6 @@
 import "server-only";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { memo, stale } from "./memo";
 import { KNOWN } from "@/lib/universe";
 import type { AssetType, PriceHistory, PriceRow, SearchResult } from "@/lib/types";
@@ -85,24 +87,61 @@ function normType(t: string): AssetType | null {
   return null;
 }
 
+/** Instant, free matches from our built-in list of well-known investments (no data request used). */
+function localMatches(lower: string): SearchResult[] {
+  const all: SearchResult[] = [
+    ...CRYPTO,
+    ...Object.values(KNOWN).map((k) => ({ ticker: k.ticker, name: k.name, assetType: k.assetType })),
+  ];
+  const seen = new Set<string>();
+  const scored: { r: SearchResult; score: number }[] = [];
+  for (const r of all) {
+    if (seen.has(r.ticker)) continue;
+    const t = r.ticker.toLowerCase();
+    const n = r.name.toLowerCase();
+    let score = 0;
+    if (t === lower) score = 100;
+    else if (t.startsWith(lower)) score = 80 - t.length;
+    else if (n.startsWith(lower)) score = 60;
+    else if (n.split(/[\s(&.,-]+/).some((w) => w.startsWith(lower))) score = 40;
+    if (score > 0) {
+      seen.add(r.ticker);
+      scored.push({ r, score });
+    }
+  }
+  return scored.sort((a, b) => b.score - a.score).map((x) => x.r);
+}
+
 export async function search(query: string): Promise<SearchResult[]> {
   const q = query.trim();
   if (!q) return [];
   const lower = q.toLowerCase();
-  const cryptoHits = CRYPTO.filter(
-    (c) => c.ticker.toLowerCase().startsWith(lower) || c.name.toLowerCase().includes(lower),
-  );
+  const local = localMatches(lower);
+  // Well-known names are answered locally; only unusual searches use the data provider.
+  if (local.length >= 1) return local.slice(0, 10);
 
-  const hits = await memo(`search:${lower}`, SEARCH_TTL, () =>
-    tiingo<TiingoSearchHit[]>(`/tiingo/utilities/search?query=${encodeURIComponent(q)}&limit=15`),
-  );
+  let hits: TiingoSearchHit[] = [];
+  try {
+    hits = await memo(`search:${lower}`, SEARCH_TTL, () =>
+      tiingo<TiingoSearchHit[]>(`/tiingo/utilities/search?query=${encodeURIComponent(q)}&limit=15`),
+    );
+  } catch (e) {
+    if (e instanceof DataError && e.code === "rate_limited") {
+      throw new DataError(
+        "Searching for less-common names is paused for a few minutes (free data plan limit). Well-known companies and funds still work, or type an exact ticker and press Enter.",
+        "rate_limited",
+        429,
+      );
+    }
+    throw e;
+  }
   const results: SearchResult[] = [];
   for (const h of hits) {
     const type = normType(h.assetType);
     if (!type || !h.isActive || (h.countryCode && h.countryCode !== "US")) continue;
     results.push({ ticker: h.ticker.toUpperCase(), name: titleCase(h.name), assetType: type });
   }
-  return [...cryptoHits, ...results].slice(0, 10);
+  return results.slice(0, 10);
 }
 
 /** Tiingo names are often ALL CAPS; make them readable. */
@@ -157,11 +196,46 @@ export async function getHistory(rawTicker: string): Promise<PriceHistory> {
 }
 
 /**
- * Caching layers: this in-memory cache per server instance, plus Vercel's CDN cache on our
- * API responses (Cache-Control s-maxage), which is shared by all visitors and never stores errors.
+ * Saved end-of-day snapshots shipped with the site (data/eod/<TICKER>.json, made by scripts/snapshot.ts).
+ * They keep the demo working even when the free data plan's hourly limit is reached.
+ */
+function readSnapshot(ticker: string): PriceHistory | null {
+  try {
+    const file = path.join(process.cwd(), "data", "eod", `${ticker}.json`);
+    return JSON.parse(readFileSync(file, "utf8")) as PriceHistory;
+  } catch {
+    return null;
+  }
+}
+
+/** The most recent U.S. market close that should exist right now (weekdays; ~6 p.m. ET publish time). */
+function expectedLatestClose(now = new Date()): string {
+  const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const d = new Date(Date.UTC(et.getFullYear(), et.getMonth(), et.getDate()));
+  if (et.getHours() < 18) d.setUTCDate(d.getUTCDate() - 1);
+  while (d.getUTCDay() === 0 || d.getUTCDay() === 6) d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Use the saved snapshot when it's current; otherwise ask the provider, and fall back to the
+ * snapshot (with its real date shown) if the provider is busy or rate-limited.
  */
 async function sharedHistory(ticker: string): Promise<PriceHistory> {
-  return loadHistory(ticker);
+  const snap = readSnapshot(ticker);
+  if (snap) {
+    const current =
+      snap.assetType === "Crypto"
+        ? Date.now() - Date.parse(snap.fetchedAt) < 24 * 3600 * 1000
+        : snap.lastDate >= expectedLatestClose();
+    if (current) return snap;
+  }
+  try {
+    return await loadHistory(ticker);
+  } catch (e) {
+    if (snap && e instanceof DataError && (e.code === "rate_limited" || e.code === "upstream")) return snap;
+    throw e;
+  }
 }
 
 async function loadHistory(ticker: string): Promise<PriceHistory> {

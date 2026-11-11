@@ -74,6 +74,17 @@ const EXTRA: Known[] = [
   { ticker: "XYL", name: "Xylem", assetType: "Stock" },
   { ticker: "PANW", name: "Palo Alto Networks", assetType: "Stock" },
   { ticker: "CRWD", name: "CrowdStrike", assetType: "Stock" },
+  // Popular funds and stocks people often type
+  { ticker: "VOO", name: "Vanguard S&P 500 ETF", assetType: "ETF" },
+  { ticker: "IVV", name: "iShares Core S&P 500 ETF", assetType: "ETF" },
+  { ticker: "VFIAX", name: "Vanguard 500 Index Fund Admiral Shares", assetType: "Mutual Fund" },
+  { ticker: "SCHD", name: "Schwab U.S. Dividend Equity ETF", assetType: "ETF" },
+  { ticker: "GLD", name: "SPDR Gold Shares", assetType: "ETF" },
+  { ticker: "TLT", name: "iShares 20+ Year Treasury Bond ETF", assetType: "ETF" },
+  { ticker: "AGG", name: "iShares Core U.S. Aggregate Bond ETF", assetType: "ETF" },
+  { ticker: "PLTR", name: "Palantir Technologies", assetType: "Stock" },
+  { ticker: "TSM", name: "Taiwan Semiconductor (ADR)", assetType: "Stock" },
+  { ticker: "UBER", name: "Uber Technologies", assetType: "Stock" },
 ];
 
 const ALL: Known[] = [...INDEXES, ...SECTORS, ...SCREENER, ...EXTRA];

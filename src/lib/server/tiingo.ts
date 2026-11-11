@@ -1,5 +1,6 @@
 import "server-only";
 import { memo, stale } from "./memo";
+import { KNOWN } from "@/lib/universe";
 import type { AssetType, PriceHistory, PriceRow, SearchResult } from "@/lib/types";
 
 const BASE = "https://api.tiingo.com";
@@ -116,6 +117,8 @@ function titleCase(name: string) {
 /** Resolve a ticker's display name and asset type (cached). */
 async function describe(ticker: string): Promise<SearchResult> {
   if (CRYPTO_SET.has(ticker)) return CRYPTO.find((c) => c.ticker === ticker)!;
+  const known = KNOWN[ticker];
+  if (known) return { ticker, name: known.name, assetType: known.assetType }; // no request needed
   const hits = await memo(`search:${ticker.toLowerCase()}`, SEARCH_TTL, () =>
     tiingo<TiingoSearchHit[]>(`/tiingo/utilities/search?query=${encodeURIComponent(ticker)}&limit=15`),
   );
@@ -144,13 +147,21 @@ export async function getHistory(rawTicker: string): Promise<PriceHistory> {
   if (!isValidTicker(ticker)) throw new DataError("That doesn't look like a valid ticker.", "bad_request", 400);
   const key = `history:${ticker}`;
   try {
-    return await memo(key, HISTORY_TTL, () => loadHistory(ticker));
+    return await memo(key, HISTORY_TTL, () => sharedHistory(ticker));
   } catch (e) {
     // If rate-limited, serve an older cached copy rather than fail
     const old = stale<PriceHistory>(key);
     if (old && e instanceof DataError && e.code === "rate_limited") return old;
     throw e;
   }
+}
+
+/**
+ * Caching layers: this in-memory cache per server instance, plus Vercel's CDN cache on our
+ * API responses (Cache-Control s-maxage), which is shared by all visitors and never stores errors.
+ */
+async function sharedHistory(ticker: string): Promise<PriceHistory> {
+  return loadHistory(ticker);
 }
 
 async function loadHistory(ticker: string): Promise<PriceHistory> {

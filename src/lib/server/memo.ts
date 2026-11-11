@@ -36,6 +36,11 @@ export async function memo<T>(key: string, ttlMs: number, load: () => Promise<T>
   return p;
 }
 
+/** Remove a cached value (e.g. a result produced with incomplete data). */
+export function forget(key: string) {
+  store.delete(key);
+}
+
 /** Peek at a cached value even if expired (used as a fallback when the provider is rate-limited). */
 export function stale<T>(key: string): T | undefined {
   return store.get(key)?.value as T | undefined;

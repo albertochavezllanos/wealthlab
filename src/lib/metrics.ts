@@ -180,6 +180,82 @@ export function backtestPortfolio(dates: string[], series: number[][], weights: 
   return values;
 }
 
+export interface Snapshot {
+  ticker: string;
+  name: string;
+  assetType: PriceHistory["assetType"];
+  close: number; // raw close on `date`
+  date: string;
+  firstDate: string;
+  chg1d: number | null;
+  chg1w: number | null;
+  chg1m: number | null;
+  ytd: number | null;
+  r1y: number | null; // total return (dividends reinvested)
+  cagr5y: number | null; // annualized total return over 5 years
+  vol1y: number | null; // annualized volatility of daily returns, last 12 months
+  mdd5y: number | null; // max drawdown over the last 5 years (or full history if shorter)
+  mdd5yPeak: string | null;
+  mdd5yTrough: string | null;
+  divYield: number | null; // trailing 12-month dividends / price
+  fromHigh: number | null; // % below 52-week high
+  spark: number[]; // ~52 weekly split-adjusted closes over the last year
+  source: string;
+  fetchedAt: string;
+}
+
+/** Point-in-time stats for one investment, computed from its real history. */
+export function snapshot(h: PriceHistory): Snapshot {
+  const rows = h.rows;
+  const n = rows.length;
+  const adj = splitAdjustedCloses(rows);
+  const last = rows[n - 1];
+  const at = (date: string) => {
+    const i = indexOnOrBefore(rows, date);
+    return i >= 0 && rows[i][0] >= h.firstDate ? i : -1;
+  };
+  const back = (range: RangeKey) => {
+    const target = rangeStart(last[0], range);
+    if (target < h.firstDate) return -1;
+    return at(target);
+  };
+  const priceChg = (i: number) => (i >= 0 && i < n - 1 ? adj[n - 1] / adj[i] - 1 : null);
+  const weekAgo = new Date(Date.parse(last[0]) - 7 * 864e5).toISOString().slice(0, 10);
+  const i1y = back("1Y"), i5y = back("5Y");
+  const ytdBase = at(`${Number(last[0].slice(0, 4)) - 1}-12-31`);
+  const yearAdj = adj.slice(i1y >= 0 ? i1y : 0);
+  const divs = splitAdjustedDividends(rows).slice(i1y >= 0 ? i1y + 1 : 0).reduce((s, d) => s + d, 0);
+  const ddFrom = i5y >= 0 ? i5y : 0;
+  const ddSeries = rows.slice(ddFrom).map((r) => r[2]);
+  const dd = maxDrawdown(ddSeries);
+  const step = Math.max(1, Math.floor(yearAdj.length / 52));
+  const spark = yearAdj.filter((_, k) => k % step === 0 || k === yearAdj.length - 1);
+  const high = Math.max(...yearAdj);
+  return {
+    ticker: h.ticker,
+    name: h.name,
+    assetType: h.assetType,
+    close: last[1],
+    date: last[0],
+    firstDate: h.firstDate,
+    chg1d: n > 1 ? last[1] / (rows[n - 2][1] / (last[4] || 1)) - 1 : null,
+    chg1w: priceChg(at(weekAgo)),
+    chg1m: priceChg(back("1M")),
+    ytd: ytdBase >= 0 ? adj[n - 1] / adj[ytdBase] - 1 : null,
+    r1y: i1y >= 0 ? last[2] / rows[i1y][2] - 1 : null,
+    cagr5y: i5y >= 0 ? cagr(rows[i5y][2], last[2], yearsBetween(rows[i5y][0], last[0])) : null,
+    vol1y: yearAdj.length > 20 ? annualizedVolatility(yearAdj, periodsPerYear(h)) : null,
+    mdd5y: ddSeries.length > 20 ? dd.pct : null,
+    mdd5yPeak: ddSeries.length > 20 ? rows[ddFrom + dd.peakIndex][0] : null,
+    mdd5yTrough: ddSeries.length > 20 ? rows[ddFrom + dd.troughIndex][0] : null,
+    divYield: h.assetType === "Crypto" ? null : divs / last[1],
+    fromHigh: high > 0 ? adj[n - 1] / high - 1 : null,
+    spark,
+    source: h.source,
+    fetchedAt: h.fetchedAt,
+  };
+}
+
 export function summarize(values: number[], dates: string[], perYear = 252) {
   const yrs = dates.length > 1 ? yearsBetween(dates[0], dates[dates.length - 1]) : 0;
   const dd = maxDrawdown(values);

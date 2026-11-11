@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Container, InProgress, PageHeader } from "@/components/ui";
+import { PageHeader } from "@/components/ui";
+import { IntelApp } from "@/components/intel/IntelApp";
 
 export const metadata: Metadata = { title: "Intelligence" };
 
@@ -9,21 +10,9 @@ export default function IntelligencePage() {
       <PageHeader
         eyebrow="WealthLab Intelligence"
         title="Research that shows its sources."
-        description="Real market numbers, company financials from SEC filings, and an AI research assistant that cites every fact and separates evidence from interpretation."
+        description="Real market numbers, company financials from SEC filings, risk measured from real history, and AI research that cites every fact and keeps evidence separate from interpretation."
       />
-      <Container className="py-12">
-        <InProgress
-          title="Intelligence"
-          items={[
-            "Market overview: major indexes and sectors",
-            "Market Pulse: a cited world-markets briefing",
-            "Company research from SEC filings",
-            "AI research assistant with citations",
-            "Future Themes Lab: long-term research shortlists",
-            "Risk metrics and a curated screener",
-          ]}
-        />
-      </Container>
+      <IntelApp />
     </>
   );
 }

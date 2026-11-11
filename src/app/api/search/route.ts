@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextResponse, connection } from "next/server";
 import { search } from "@/lib/server/tiingo";
 import { errorResponse } from "@/lib/server/respond";
 
 export async function GET(request: Request) {
+  await connection(); // always run at request time, never during the build
   const q = new URL(request.url).searchParams.get("q")?.slice(0, 40) ?? "";
   try {
     const results = await search(q);

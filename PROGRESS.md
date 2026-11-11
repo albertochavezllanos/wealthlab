@@ -32,8 +32,20 @@ never fabricate data; no fake buttons; keys only in `.env.local` and Vercel; end
   alternate, decisions editor, comparison chart with markers, holdings, ledger, browser-saved workspaces +
   autosave), ReplayCovid (decide on 2020-03-16, reveal), ReplayBubble (2000-03-10, QQQ/CSCO/INTC/AMZN/SPY).
   Methodology page fully written.
-- [ ] Stage 4 — Intelligence core
-- [ ] Stage 5 — Market Pulse + Future Themes Lab
+- [x] **Stage 4 — Intelligence core** (`/intelligence`, tabs `#markets|company|assistant|themes|risk|screener`):
+  market overview (`/api/market?group=indexes|sectors`), company research from SEC EDGAR (`src/lib/server/sec.ts`,
+  `/api/company`), AI research assistant (`src/lib/server/assistant.ts`, GET `/api/assistant?q=` — deterministic
+  ticker detection, data packet with source IDs, ONE Claude call with JSON schema, uncited facts dropped),
+  risk lab (vol, drawdown/underwater, correlation, concentration), screener of ~60 curated tickers
+  (`src/lib/universe.ts`, `/api/screener`, partial results + "pending" when Tiingo rate-limits).
+- [x] **Stage 5 — Market Pulse + Future Themes Lab**: `src/lib/server/webresearch.ts` (Claude + web search
+  `web_search_20250305` — the 20260209 dynamic-filtering variant returned text WITHOUT citations, don't switch back),
+  `/api/pulse` (CDN cache 3h), `/api/theme?id=` (+ `&part=market`), themes in `src/lib/themes.ts`.
+- AI model: `claude-opus-5-5`, effort medium, server-side refusal fallback beta (`fallbacks: "default"`).
+  Spend guard: 40 AI calls/hour/instance. Caching: in-memory `memo` + Vercel CDN `s-maxage` on GET routes.
+- GOTCHAS: (1) every data API route must `await connection()` or Next prerenders it at BUILD time (this burned the
+  Tiingo hourly limit once). (2) Don't use `"use cache"` around code that throws DataError — the error class is lost.
+  (3) Tiingo free plan = 50 requests/hour, shared by local testing and production.
 - [ ] Stage 6 — Testing and final deploy
 - [ ] Stage 7 — Deliverables (feature list, demo script, role statement)
 

@@ -12,7 +12,28 @@ export class FetchError extends Error {
   }
 }
 
-async function getJson<T>(url: string): Promise<T> {
+/** Load JSON from one of our API routes, with a reload function. `url = null` means "don't load yet". */
+export function useJson<T>(url: string | null): Loadable<T> & { reload: () => void } {
+  const [state, setState] = useState<Loadable<T>>({ status: "idle" });
+  const [nonce, setNonce] = useState(0);
+  useEffect(() => {
+    if (!url) {
+      setState({ status: "idle" });
+      return;
+    }
+    let alive = true;
+    setState({ status: "loading" });
+    getJson<T>(nonce ? `${url}${url.includes("?") ? "&" : "?"}r=${nonce}` : url)
+      .then((data) => alive && setState({ status: "ready", data }))
+      .catch((e: FetchError) => alive && setState({ status: "error", error: e.message, code: e.code }));
+    return () => {
+      alive = false;
+    };
+  }, [url, nonce]);
+  return { ...state, reload: () => setNonce(Date.now()) } as Loadable<T> & { reload: () => void };
+}
+
+export async function getJson<T>(url: string): Promise<T> {
   let res: Response;
   try {
     res = await fetch(url);

@@ -1,4 +1,7 @@
 import { NextResponse, connection } from "next/server";
+
+/** AI web research and multi-ticker loads can take up to a minute. */
+export const maxDuration = 120;
 import { getThemeResearch } from "@/lib/server/pulse";
 import { loadSnapshots } from "@/lib/server/batch";
 import { errorResponse } from "@/lib/server/respond";

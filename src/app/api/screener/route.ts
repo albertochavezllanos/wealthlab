@@ -1,4 +1,7 @@
 import { NextResponse, connection } from "next/server";
+
+/** AI web research and multi-ticker loads can take up to a minute. */
+export const maxDuration = 120;
 import { batchCacheHeader, loadSnapshots } from "@/lib/server/batch";
 import { errorResponse } from "@/lib/server/respond";
 import { SCREENER } from "@/lib/universe";

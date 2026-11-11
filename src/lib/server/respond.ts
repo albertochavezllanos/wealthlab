@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { DataError } from "./tiingo";
 
 /** Shared CDN caching header for end-of-day data (shared across all visitors). */
-export const EOD_CACHE = "public, s-maxage=21600, stale-while-revalidate=43200";
+export const EOD_CACHE = "public, s-maxage=21600, stale-while-revalidate=86400";
 
 export function errorResponse(e: unknown) {
   if (e instanceof DataError) {

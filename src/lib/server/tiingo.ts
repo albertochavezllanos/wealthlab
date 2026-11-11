@@ -4,7 +4,7 @@ import { KNOWN } from "@/lib/universe";
 import type { AssetType, PriceHistory, PriceRow, SearchResult } from "@/lib/types";
 
 const BASE = "https://api.tiingo.com";
-const HISTORY_TTL = 6 * 60 * 60 * 1000; // end-of-day data: 6 hours is plenty
+const HISTORY_TTL = 8 * 60 * 60 * 1000; // end-of-day data changes once a day
 const SEARCH_TTL = 24 * 60 * 60 * 1000;
 
 export class DataError extends Error {

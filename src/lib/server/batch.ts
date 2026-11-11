@@ -49,5 +49,5 @@ export async function loadSnapshots(tickers: string[], concurrency = 4): Promise
 
 /** Cache header: long CDN caching only when everything loaded. */
 export function batchCacheHeader(r: BatchResult) {
-  return r.pending.length || r.failed.length ? "no-store" : "public, s-maxage=3600, stale-while-revalidate=21600";
+  return r.pending.length || r.failed.length ? "no-store" : "public, s-maxage=21600, stale-while-revalidate=86400";
 }

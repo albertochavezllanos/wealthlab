@@ -93,7 +93,7 @@ export function ReplayCovid() {
           </div>
           <h2 className="mt-2 font-serif text-2xl sm:text-3xl">Monday, March 16, 2020</h2>
         </div>
-        <div className="grid gap-6 p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
+        <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
           <div className="min-w-0">
             <p className="text-sm leading-relaxed text-charcoal">
               On January 2, 2020 you invested <strong>{usd(INVESTED)}</strong> in SPY (an S&amp;P 500 fund) and kept <strong>{usd(SIDE_CASH)}</strong> in cash.

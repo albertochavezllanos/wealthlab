@@ -99,7 +99,7 @@ export function PortfolioPanel() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
         <Card>
           <h2 className="font-serif text-xl text-navy">Build a portfolio</h2>
           <p className="mt-1 text-sm text-muted">Add up to 8 investments and set target weights. We test it on real history, rebalanced monthly.</p>
@@ -225,7 +225,7 @@ export function PortfolioPanel() {
       </div>
 
       {analysis && !("error" in analysis) && (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
           <Card>
             <h3 className="font-serif text-lg text-navy">Allocation</h3>
             <div className="h-52">

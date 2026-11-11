@@ -61,7 +61,7 @@ function ThemeDetail({ id }: { id: string }) {
   const market = useJson<Batch>(`/api/theme?id=${id}&part=market`);
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <Card className="min-w-0">
         <h3 className="font-serif text-2xl text-navy">{theme.title}</h3>
         <p className="mt-1 text-sm text-muted">{theme.oneLiner}</p>

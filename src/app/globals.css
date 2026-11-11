@@ -30,6 +30,8 @@ html {
 }
 
 body {
+  /* Invisible chart tooltips can sit off-screen; never let them cause sideways scrolling on phones */
+  overflow-x: clip;
   background: var(--color-ivory);
   color: var(--color-charcoal);
   font-family: var(--font-sans);

@@ -119,7 +119,7 @@ export function ReplayBubble() {
           </div>
           <h2 className="mt-2 font-serif text-2xl sm:text-3xl">Friday, March 10, 2000</h2>
         </div>
-        <div className="grid gap-6 p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
+        <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
           <div className="min-w-0">
             <p className="text-sm leading-relaxed text-charcoal">
               Your conviction: <strong>the internet will transform the economy</strong>. In hindsight, you&rsquo;re right. Online shopping, cloud computing,

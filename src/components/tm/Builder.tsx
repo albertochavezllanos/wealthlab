@@ -154,7 +154,7 @@ export function Builder() {
         {msg && <p className="mt-3 text-xs text-positive">{msg}</p>}
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)]">
         {/* LEFT: setup + decisions */}
         <div className="space-y-6">
           <Card>

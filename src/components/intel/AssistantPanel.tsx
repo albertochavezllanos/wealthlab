@@ -44,7 +44,7 @@ export function AssistantPanel() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
       <Card className="self-start">
         <div className="flex items-center gap-2"><h2 className="font-serif text-xl text-navy">Ask the research assistant</h2></div>
         <p className="mt-1 text-sm text-muted">Name up to 4 companies. It retrieves SEC filings and price history first, then answers only from that data, with sources for every fact.</p>

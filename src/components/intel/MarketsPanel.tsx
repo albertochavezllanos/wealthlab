@@ -48,7 +48,7 @@ export function MarketsPanel() {
   const [period, setPeriod] = useState<PeriodKey>("ytd");
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
       <div className="min-w-0 space-y-6">
         <Card>
           <SectionTitle sub="Tracked through the ETFs that follow each index · end-of-day closes, not real-time">Major indexes</SectionTitle>

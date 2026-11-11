@@ -34,7 +34,7 @@ export function CompanyPanel() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
         <TickerSearch onSelect={(x) => setTicker(x.ticker)} placeholder="Search a U.S.-listed company (e.g. Apple, JPMorgan, Coca-Cola)" />
         <div className="flex flex-wrap gap-1.5">
           {QUICK.map((t) => (

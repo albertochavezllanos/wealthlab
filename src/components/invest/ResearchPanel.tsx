@@ -29,7 +29,7 @@ export function ResearchPanel() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
         <TickerSearch onSelect={(r) => setTicker(r.ticker)} />
         <div className="flex flex-wrap gap-1.5">
           {QUICK.map((t) => (

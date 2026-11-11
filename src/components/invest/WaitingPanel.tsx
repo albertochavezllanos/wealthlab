@@ -31,7 +31,7 @@ export function WaitingPanel() {
   }, [res, years, initial]);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
       <Card>
         <h2 className="font-serif text-xl text-navy">The cost of waiting</h2>
         <p className="mt-1 text-sm text-muted">

@@ -87,7 +87,7 @@ export default function MethodologyPage() {
         title="How WealthLab calculates what you see."
         description="A plain-English explanation of the data and accounting rules behind every number, and what the simulations leave out."
       />
-      <Container className="grid gap-8 py-12 lg:grid-cols-[220px_minmax(0,1fr)]">
+      <Container className="grid grid-cols-1 gap-8 py-12 lg:grid-cols-[220px_minmax(0,1fr)]">
         <nav aria-label="Methodology sections" className="hidden lg:block">
           <ul className="sticky top-28 space-y-1 text-sm">
             {SECTIONS.map((s) => (

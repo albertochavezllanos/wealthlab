@@ -49,6 +49,28 @@ export function downsample<T>(arr: T[], max = 700): T[] {
   return out;
 }
 
+/**
+ * Clean x-axis ticks for a list of ISO dates: first point of each year (or each quarter/month
+ * for shorter spans), thinned to at most `max` labels.
+ */
+export function dateTicks(dates: string[], max = 8): { ticks: string[]; format: (d: string) => string } {
+  if (dates.length < 2) return { ticks: dates, format: (d) => d };
+  const days = (Date.parse(dates[dates.length - 1]) - Date.parse(dates[0])) / 864e5;
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const key = days > 3 * 365 ? (d: string) => d.slice(0, 4) : days > 120 ? (d: string) => d.slice(0, 7) : (d: string) => d.slice(0, 10);
+  const ticks: string[] = [];
+  for (let i = 1; i < dates.length; i++) if (key(dates[i]) !== key(dates[i - 1])) ticks.push(dates[i]);
+  const step = Math.ceil(ticks.length / max) || 1;
+  const thinned = ticks.filter((_, i) => i % step === 0);
+  const format =
+    days > 3 * 365
+      ? (d: string) => d.slice(0, 4)
+      : days > 120
+        ? (d: string) => `${MONTHS[Number(d.slice(5, 7)) - 1]} '${d.slice(2, 4)}`
+        : (d: string) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${Number(d.slice(8, 10))}`;
+  return { ticks: thinned, format };
+}
+
 export function Legend({ items }: { items: { label: string; color: string; dashed?: boolean }[] }) {
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-muted">

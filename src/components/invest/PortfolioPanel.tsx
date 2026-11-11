@@ -5,7 +5,7 @@ import { CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContaine
 import { TickerSearch } from "@/components/TickerSearch";
 import { Button, Notice, NumberField, Segmented, Spinner, Stat } from "@/components/form";
 import { Card } from "@/components/ui";
-import { C, Legend, TooltipCard, axisProps, downsample } from "@/components/charts/theme";
+import { C, Legend, TooltipCard, axisProps, dateTicks, downsample } from "@/components/charts/theme";
 import { useHistories } from "@/lib/client/data";
 import { deleteSaved, listSaved, newId, upsertSaved, type Saved } from "@/lib/client/storage";
 import { compactUsd, fmtDate, num, pct, usd } from "@/lib/format";
@@ -67,8 +67,9 @@ export function PortfolioPanel() {
     const rets = series.slice(0, hs.length).map((s) => simpleReturns(s));
     const corr = rets.map((a) => rets.map((b) => correlation(a, b)));
     const chart = downsample(dates.map((d, i) => ({ date: d, port: port[i], bench: bench[i] })), 600);
+    const axis = dateTicks(chart.map((p) => p.date));
     return {
-      dates, port, bench, ps, bs, each, corr, chart,
+      dates, port, bench, ps, bs, each, corr, chart, axis,
       shortened: start > requested && period !== "MAX",
       start,
       conc: concentration(holdings.map((h) => h.weight)),
@@ -196,7 +197,7 @@ export function PortfolioPanel() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={analysis.chart} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke={C.grid} vertical={false} />
-                    <XAxis dataKey="date" {...axisProps} minTickGap={56} tickFormatter={(d: string) => (period === "1Y" ? fmtDate(d).replace(/, \d{4}$/, "") : d.slice(0, 4))} />
+                    <XAxis dataKey="date" {...axisProps} ticks={analysis.axis.ticks} interval={0} tickFormatter={analysis.axis.format} />
                     <YAxis {...axisProps} width={64} domain={["auto", "auto"]} tickFormatter={(v: number) => compactUsd(v)} />
                     <Tooltip
                       content={({ active, payload }) =>

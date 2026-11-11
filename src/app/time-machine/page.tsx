@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Container, InProgress, PageHeader } from "@/components/ui";
+import { PageHeader } from "@/components/ui";
+import { TimeMachineApp } from "@/components/tm/TimeMachineApp";
 
 export const metadata: Metadata = { title: "Time Machine" };
 
@@ -9,21 +10,9 @@ export default function TimeMachinePage() {
       <PageHeader
         eyebrow="WealthLab Time Machine"
         title="Go back. Decide. See what really happened."
-        description="Replay real market history with actual end-of-day prices, make your own decisions, and compare every path against simply holding the S&P 500."
+        description="Replay real market history with actual end-of-day prices. Make decisions, branch alternate timelines, and compare every path against simply holding the S&P 500 with the same cash flows."
       />
-      <Container className="py-12">
-        <InProgress
-          title="Time Machine"
-          items={[
-            "Buy, sell, deposit, withdraw, switch, and recurring contributions",
-            "Daily cash, shares, cost basis, and portfolio value",
-            "Correct handling of stock splits and dividends",
-            "Alternate timelines compared on one chart",
-            "Benchmark against holding SPY with the same cash flows",
-            "Historical replays: March 2020 and the 1999–2002 tech bubble",
-          ]}
-        />
-      </Container>
+      <TimeMachineApp />
     </>
   );
 }

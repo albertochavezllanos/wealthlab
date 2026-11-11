@@ -24,7 +24,14 @@ never fabricate data; no fake buttons; keys only in `.env.local` and Vercel; end
   concentration in `src/lib/metrics.ts`); browser-only saved scenarios + portfolios (`src/lib/client/storage.ts`).
   Data: `/api/history?ticker=` returns compact rows `[date, rawClose, adjClose, divCash, splitFactor]`,
   cached in memory 6h + CDN `s-maxage`. `/api/search?q=`.
-- [ ] Stage 3 — Time Machine
+- [x] **Stage 3 — Time Machine** (`/time-machine`, tabs `#build|covid|bubble`). Engine `src/lib/timemachine.ts`
+  (raw closes + split factors + divCash; actions buy/sell/switch/deposit/withdraw/recurring; validation; ledger
+  with per-entry balance check; cash reconciliation; SPY benchmark from executed cash flows, dividends reinvested).
+  Tests: `scripts/test-timemachine.ts` (real Tiingo data: NVDA 2021/2024 + AAPL 2020 splits, KO dividends both
+  modes, branch immutability, invalid-action blocking). UI: `src/components/tm/*` — Builder (timelines, copy as
+  alternate, decisions editor, comparison chart with markers, holdings, ledger, browser-saved workspaces +
+  autosave), ReplayCovid (decide on 2020-03-16, reveal), ReplayBubble (2000-03-10, QQQ/CSCO/INTC/AMZN/SPY).
+  Methodology page fully written.
 - [ ] Stage 4 — Intelligence core
 - [ ] Stage 5 — Market Pulse + Future Themes Lab
 - [ ] Stage 6 — Testing and final deploy

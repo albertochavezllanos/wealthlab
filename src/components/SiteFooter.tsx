@@ -1,13 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Logo } from "./Logo";
 
 export function SiteFooter() {
-  const pathname = usePathname();
-  if (pathname === "/access") return null;
-
   return (
     <footer className="mt-24 bg-navy-deep text-slate">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.2fr_1fr]">

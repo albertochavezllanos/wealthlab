@@ -8,7 +8,7 @@ import { C, TooltipCard, axisProps } from "@/components/charts/theme";
 import { useJson } from "@/lib/client/data";
 import { fmtDate, fmtDateTime, pct, price } from "@/lib/format";
 import type { Snapshot } from "@/lib/metrics";
-import { Chg, CiteChips, SectionTitle, Sparkline, hostOf, sourceDate } from "./shared";
+import { AiNotice, Chg, CiteChips, SectionTitle, Sparkline, hostOf, sourceDate } from "./shared";
 
 interface Batch { rows: Snapshot[]; pending: string[]; failed: { ticker: string; error: string }[]; rateLimited: boolean }
 interface Pulse {
@@ -137,9 +137,8 @@ function PulseCard() {
         </div>
       )}
       {p.status === "error" && (
-        <div className="mt-4 space-y-3">
-          <Notice tone="error">{p.error}</Notice>
-          <Button size="sm" variant="secondary" onClick={() => { setOn(true); p.reload(); }}>Try again</Button>
+        <div className="mt-4">
+          <AiNotice message={p.error} code={p.code} onRetry={() => { setOn(true); p.reload(); }} />
         </div>
       )}
       {p.status === "ready" && (

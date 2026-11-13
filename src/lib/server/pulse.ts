@@ -21,20 +21,22 @@ Rules:
 - No predictions, no price targets, no buy/sell language. Describe, don't advise.
 - No introduction or conclusion outside the items.`;
 
-async function pulseCached(): Promise<WebResearch> {
+async function pulseCached(visitor: string): Promise<WebResearch> {
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "America/Chicago" });
   const r = await webResearch({
     system: PULSE_SYSTEM,
     prompt: `Today is ${today} (U.S. Central Time). Write today's Market Pulse briefing covering the last few days.`,
     maxSearches: 6,
     requireCitations: () => true,
+    visitor,
   });
   if (r.sections.length === 0) throw new DataError("The briefing came back without cited sources, so it wasn't shown. Please try again later.", "upstream", 502);
   return r;
 }
 
-export function getPulse() {
-  return memo("pulse", 3 * 3600 * 1000, pulseCached);
+/** Shared briefing: only the visitor whose request actually generates it is counted. */
+export function getPulse(visitor: string) {
+  return memo("pulse", 3 * 3600 * 1000, () => pulseCached(visitor));
 }
 
 // ---------------- Future Themes ----------------
@@ -58,7 +60,7 @@ Rules:
 - Horizon: the next 15 to 20 years. No predictions of prices or returns, no recommendations, no buy/sell language.
 - No text outside the three sections.`;
 
-async function themeCached(id: string): Promise<WebResearch> {
+async function themeCached(id: string, visitor: string): Promise<WebResearch> {
   const theme = THEMES.find((t) => t.id === id);
   if (!theme) throw new DataError("Unknown theme.", "not_found", 404);
   const r = await webResearch({
@@ -66,6 +68,7 @@ async function themeCached(id: string): Promise<WebResearch> {
     prompt: `Theme: ${theme.title}. ${theme.oneLiner}\nResearch focus: ${theme.researchFocus}.`,
     maxSearches: 5,
     requireCitations: (h) => /evidence/i.test(h),
+    visitor,
   });
   if (!r.sections.some((s) => /evidence/i.test(s.heading) && s.items.length)) {
     throw new DataError("The research came back without cited evidence, so it wasn't shown. Please try again later.", "upstream", 502);
@@ -73,6 +76,6 @@ async function themeCached(id: string): Promise<WebResearch> {
   return r;
 }
 
-export function getThemeResearch(id: string) {
-  return memo(`theme:${id}`, 24 * 3600 * 1000, () => themeCached(id));
+export function getThemeResearch(id: string, visitor: string) {
+  return memo(`theme:${id}`, 24 * 3600 * 1000, () => themeCached(id, visitor));
 }

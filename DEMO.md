@@ -1,6 +1,6 @@
 # WealthLab — Demo Kit
 
-Live site: **https://wealthlab-theta.vercel.app** (passcode required: the one you chose)
+Live site: **https://wealthlab-theta.vercel.app** (open to anyone, no passcode)
 
 ---
 
@@ -69,7 +69,8 @@ Live site: **https://wealthlab-theta.vercel.app** (passcode required: the one yo
 
 ## 4. Known limits (say these plainly if asked)
 
-- **Prices are end-of-day,** not real-time. Free Tiingo data is licensed for personal use, hence the passcode.
+- **Prices are end-of-day,** not real-time. Tiingo's license (even the paid Power plan) is for internal use; a public product would need a redistribution license.
+- **AI is limited to 10 new requests per visitor per day** to protect the AI budget. Cached answers don't count.
 - **Tiingo's free plan allows 50 data requests per hour.** Data is cached for hours after the first load, but a burst of new tickers can show "waiting on the data limit." Open the main screens before a demo.
 - **Simulations ignore taxes, fees, slippage, and interest on cash.** Dividends are credited on the ex-date (real payment comes later).
 - **The screener covers about 60 curated tickers,** not the whole market. **Expense ratios aren't shown:** no verified free source.

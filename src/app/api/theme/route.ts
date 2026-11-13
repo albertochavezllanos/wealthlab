@@ -5,6 +5,7 @@ export const maxDuration = 120;
 import { getThemeResearch } from "@/lib/server/pulse";
 import { loadSnapshots } from "@/lib/server/batch";
 import { errorResponse } from "@/lib/server/respond";
+import { visitorId } from "@/lib/server/quota";
 import { THEMES } from "@/lib/themes";
 
 export async function GET(request: Request) {
@@ -18,7 +19,7 @@ export async function GET(request: Request) {
       const m = await loadSnapshots(theme.exposures.map((e) => e.ticker));
       return NextResponse.json(m, { headers: { "Cache-Control": m.pending.length || m.failed.length ? "no-store" : "public, s-maxage=3600" } });
     }
-    return NextResponse.json(await getThemeResearch(id), { headers: { "Cache-Control": "public, s-maxage=86400" } });
+    return NextResponse.json(await getThemeResearch(id, visitorId(request)), { headers: { "Cache-Control": "public, s-maxage=86400" } });
   } catch (e) {
     return errorResponse(e);
   }

@@ -5,7 +5,7 @@ import { Button, Notice, Spinner } from "@/components/form";
 import { Badge, Card } from "@/components/ui";
 import { getJson, FetchError } from "@/lib/client/data";
 import { fmtDate, fmtDateTime } from "@/lib/format";
-import { CiteChips } from "./shared";
+import { AiNotice, CiteChips } from "./shared";
 
 interface Cited { text: string; sources: string[] }
 interface Answer {
@@ -26,7 +26,7 @@ export function AssistantPanel() {
   const [q, setQ] = useState(EXAMPLES[0]);
   const [busy, setBusy] = useState(false);
   const [resp, setResp] = useState<Resp | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ message: string; code?: string } | null>(null);
 
   async function ask(question = q) {
     const text = question.trim();
@@ -37,7 +37,7 @@ export function AssistantPanel() {
     try {
       setResp(await getJson<Resp>(`/api/assistant?q=${encodeURIComponent(text.replace(/\s+/g, " "))}`));
     } catch (e) {
-      setError(e instanceof FetchError ? e.message : "Something went wrong.");
+      setError(e instanceof FetchError ? { message: e.message, code: e.code } : { message: "Something went wrong." });
     } finally {
       setBusy(false);
     }
@@ -65,7 +65,7 @@ export function AssistantPanel() {
             <button key={e} type="button" disabled={busy} onClick={() => { setQ(e); ask(e); }} className="rounded-lg px-2 py-1 text-left text-sm text-blue hover:bg-slate disabled:opacity-50">{e} →</button>
           ))}
         </div>
-        <p className="mt-5 text-[11px] leading-relaxed text-muted">The assistant never predicts prices or tells you to buy or sell. Repeat questions are answered from a cache, so they&rsquo;re instant and cost nothing.</p>
+        <p className="mt-5 text-[11px] leading-relaxed text-muted">The assistant never predicts prices or tells you to buy or sell. Each visitor can ask up to 10 new AI questions a day; questions someone has already asked load from the cache instantly and don&rsquo;t count.</p>
       </Card>
 
       <div className="min-w-0">
@@ -75,7 +75,7 @@ export function AssistantPanel() {
             <p className="max-w-sm text-xs text-muted">Usually 15–40 seconds for a new question.</p>
           </Card>
         )}
-        {error && <Notice tone="error">{error}</Notice>}
+        {error && <AiNotice message={error.message} code={error.code} />}
         {resp && "needTickers" in resp && <Notice tone="info">{resp.message}</Notice>}
         {resp && !("needTickers" in resp) && <AnswerView a={resp} />}
         {!busy && !resp && !error && (

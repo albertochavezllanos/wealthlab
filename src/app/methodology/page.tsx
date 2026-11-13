@@ -10,7 +10,8 @@ const SECTIONS: { id: string; title: string; body: string[] }[] = [
     body: [
       "Prices come from Tiingo's end-of-day data: the official closing price for each trading day, never real-time quotes. Every price on screen shows the date it refers to. Crypto prices are Tiingo's daily close for the UTC calendar day.",
       "The Time Machine uses raw (unadjusted) closing prices together with Tiingo's split factors and dividend amounts, so every transaction happens at the price that actually traded that day. Charts in Invest are split-adjusted so a split doesn't look like a crash.",
-      "Tiingo's free data is licensed for personal use, which is why this prototype sits behind a passcode. Data is cached on our server for up to 6 hours to stay within the free plan's limits.",
+      "End-of-day prices are saved and cached on our server, so pages load quickly and the site makes as few data requests as possible. Every price shows the close date it refers to.",
+      "AI features (Market Pulse, the research assistant, and Future Themes research) are limited to 10 new requests per visitor per day. Answers that have already been generated load from the cache and don't count toward the limit.",
     ],
   },
   {

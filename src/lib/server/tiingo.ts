@@ -12,7 +12,7 @@ const SEARCH_TTL = 24 * 60 * 60 * 1000;
 export class DataError extends Error {
   constructor(
     message: string,
-    public code: "not_found" | "rate_limited" | "bad_request" | "upstream" | "not_configured",
+    public code: "not_found" | "rate_limited" | "bad_request" | "upstream" | "not_configured" | "daily_limit",
     public status: number,
   ) {
     super(message);

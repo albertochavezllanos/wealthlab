@@ -2,6 +2,7 @@ import "server-only";
 import type Anthropic from "@anthropic-ai/sdk";
 import { FALLBACK_BETA, MODEL, aiError, anthropic, spendGuard } from "./ai";
 import { DataError } from "./tiingo";
+import { consumeAiRequest, refundAiRequest } from "./quota";
 
 export interface WebSource { n: number; title: string; url: string; date: string | null }
 export interface ResearchItem { text: string; cites: number[] }
@@ -27,12 +28,15 @@ export async function webResearch(opts: {
   prompt: string;
   maxSearches: number;
   requireCitations: (heading: string) => boolean;
+  /** Anonymous visitor ID: counts toward that visitor's daily AI limit */
+  visitor: string;
 }): Promise<WebResearch> {
-  spendGuard();
-  const client = anthropic();
+  await consumeAiRequest(opts.visitor);
   const messages: Anthropic.Beta.BetaMessageParam[] = [{ role: "user", content: opts.prompt }];
   const blocks: Block[] = [];
   try {
+    spendGuard();
+    const client = anthropic();
     for (let turn = 0; turn < 4; turn++) {
       const res = await client.beta.messages.create({
         model: MODEL,
@@ -53,6 +57,7 @@ export async function webResearch(opts: {
       messages.push({ role: "assistant", content: res.content as Anthropic.Beta.BetaContentBlockParam[] });
     }
   } catch (e) {
+    await refundAiRequest(opts.visitor); // the AI call failed on our side: don't charge the visitor
     throw aiError(e);
   }
 

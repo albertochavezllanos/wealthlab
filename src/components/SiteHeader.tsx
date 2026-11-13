@@ -19,8 +19,6 @@ export function SiteHeader() {
   // Close the mobile menu whenever the page changes
   useEffect(() => setOpen(false), [pathname]);
 
-  if (pathname === "/access") return null;
-
   return (
     <header className="sticky top-0 z-40 border-b border-slate-line/70 bg-ivory/90 backdrop-blur">
       <div className="bg-navy text-center text-[11px] font-medium tracking-wide text-white/85 sm:text-xs">

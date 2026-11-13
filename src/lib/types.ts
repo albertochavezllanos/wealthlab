@@ -30,5 +30,5 @@ export interface PriceHistory {
 
 export interface ApiError {
   error: string;
-  code?: "not_found" | "rate_limited" | "bad_request" | "upstream" | "not_configured";
+  code?: "not_found" | "rate_limited" | "bad_request" | "upstream" | "not_configured" | "daily_limit";
 }

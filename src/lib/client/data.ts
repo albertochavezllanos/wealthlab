@@ -42,9 +42,6 @@ export async function getJson<T>(url: string): Promise<T> {
   }
   const data = await res.json().catch(() => null);
   if (!res.ok) {
-    if (res.status === 401) {
-      window.location.assign("/access");
-    }
     throw new FetchError(data?.error ?? `Request failed (${res.status}).`, data?.code);
   }
   return data as T;

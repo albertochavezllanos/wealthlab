@@ -70,3 +70,28 @@ export function hostOf(url: string) {
     return url;
   }
 }
+
+/**
+ * How AI features show problems. The daily per-visitor limit gets a calm, friendly note
+ * (no retry button, since retrying won't help until tomorrow); real errors get a retry.
+ */
+export function AiNotice({ message, code, onRetry }: { message: string; code?: string; onRetry?: () => void }) {
+  if (code === "daily_limit") {
+    return (
+      <div role="status" className="rounded-xl border border-blue/20 bg-blue/5 px-4 py-3 text-sm leading-relaxed text-charcoal">
+        <p className="font-semibold text-navy">You&rsquo;ve reached today&rsquo;s AI limit</p>
+        <p className="mt-1">{message}</p>
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-3">
+      <div role="alert" className="rounded-xl border border-negative/25 bg-negative/5 px-4 py-3 text-sm leading-relaxed text-negative">{message}</div>
+      {onRetry && (
+        <button type="button" onClick={onRetry} className="rounded-full border border-slate-line bg-white px-3 py-1.5 text-xs font-semibold text-navy hover:border-navy/40">
+          Try again
+        </button>
+      )}
+    </div>
+  );
+}

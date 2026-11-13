@@ -2,6 +2,7 @@ import "server-only";
 import { FALLBACK_BETA, MODEL, aiError, anthropic, spendGuard } from "./ai";
 import { companyReport, type CompanyReport } from "./company";
 import { forget, memo } from "./memo";
+import { consumeAiRequest, refundAiRequest } from "./quota";
 import { secTitles } from "./sec";
 import { getHistory, DataError } from "./tiingo";
 import { snapshot, type Snapshot } from "@/lib/metrics";
@@ -203,16 +204,17 @@ const SCHEMA = {
 
 const ADVICE = /\b(should i (buy|sell|invest)|is it a (good )?buy|price target|will .{0,40}\b(go up|go down|rise|fall|crash|reach)\b|what will .{0,30} be worth|predict)/i;
 
-async function generate(question: string, tickers: string[]): Promise<AssistantAnswer> {
+async function generate(question: string, tickers: string[], visitor: string): Promise<AssistantAnswer> {
   const packet = await buildPacket(tickers);
   if (!packet.data.some((d) => d.market_data || d.financials)) {
     throw new DataError("Couldn't retrieve data for those companies right now, so no AI answer was generated.", "upstream", 502);
   }
-  spendGuard();
+  await consumeAiRequest(visitor);
   const user = `Data packet (JSON):\n${JSON.stringify({ retrieved_at: new Date().toISOString().slice(0, 10), companies: packet.data, retrieval_gaps: packet.missing })}\n\nSource list:\n${packet.sources.map((s) => `${s.id}: ${s.label}`).join("\n")}\n\nUser question: ${question}`;
 
   let text = "";
   try {
+    spendGuard();
     const res = await anthropic().beta.messages.create({
       model: MODEL,
       max_tokens: 8000,
@@ -225,6 +227,7 @@ async function generate(question: string, tickers: string[]): Promise<AssistantA
     if (res.stop_reason === "refusal") throw new DataError("The AI declined to answer this question.", "upstream", 502);
     for (const b of res.content) if (b.type === "text") text += b.text;
   } catch (e) {
+    await refundAiRequest(visitor); // the AI call failed on our side: don't charge the visitor
     throw aiError(e);
   }
 
@@ -258,7 +261,7 @@ async function generate(question: string, tickers: string[]): Promise<AssistantA
   };
 }
 
-export async function ask(rawQuestion: string): Promise<AssistantAnswer | { needTickers: true; message: string }> {
+export async function ask(rawQuestion: string, visitor: string): Promise<AssistantAnswer | { needTickers: true; message: string }> {
   const question = rawQuestion.trim().replace(/\s+/g, " ").slice(0, 400);
   if (question.length < 3) throw new DataError("Please type a question.", "bad_request", 400);
   const tickers = await findTickers(question);
@@ -267,7 +270,8 @@ export async function ask(rawQuestion: string): Promise<AssistantAnswer | { need
   }
   const key = `ask:${question.toLowerCase()}|${tickers.join(",")}`;
   // In-memory cache here + CDN cache on the route: the same question never triggers a second AI call while cached
-  const answer = await memo(key, 12 * 3600 * 1000, () => generate(question, tickers));
+  // Only a cache miss runs the AI, so only a cache miss counts toward the visitor's daily limit
+  const answer = await memo(key, 12 * 3600 * 1000, () => generate(question, tickers, visitor));
   // Don't keep answers produced while some data was temporarily unavailable
   if (answer.degraded) forget(key);
   return answer;

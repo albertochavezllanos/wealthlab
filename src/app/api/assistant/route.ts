@@ -4,6 +4,7 @@ import { NextResponse, connection } from "next/server";
 export const maxDuration = 120;
 import { ask } from "@/lib/server/assistant";
 import { errorResponse } from "@/lib/server/respond";
+import { visitorId } from "@/lib/server/quota";
 
 /**
  * GET so Vercel's CDN can cache identical questions for 12 hours across all visitors:
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
   await connection();
   const question = (new URL(request.url).searchParams.get("q") ?? "").slice(0, 400);
   try {
-    const answer = await ask(question);
+    const answer = await ask(question, visitorId(request));
     const cacheable = !("needTickers" in answer) && !answer.degraded;
     return NextResponse.json(answer, {
       headers: { "Cache-Control": cacheable ? "public, s-maxage=43200, stale-while-revalidate=3600" : "no-store" },

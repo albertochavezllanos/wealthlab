@@ -7,7 +7,7 @@ import { useJson } from "@/lib/client/data";
 import { fmtDate, fmtDateTime, pct, price } from "@/lib/format";
 import type { Snapshot } from "@/lib/metrics";
 import { THEMES } from "@/lib/themes";
-import { Chg, CiteChips, Sparkline, hostOf, sourceDate } from "./shared";
+import { AiNotice, Chg, CiteChips, Sparkline, hostOf, sourceDate } from "./shared";
 import { BatchNotice } from "./MarketsPanel";
 
 interface Research {
@@ -72,7 +72,7 @@ function ThemeDetail({ id }: { id: string }) {
           </div>
         )}
         {research.status === "error" && (
-          <div className="mt-4 space-y-3"><Notice tone="error">{research.error}</Notice><Button size="sm" variant="secondary" onClick={research.reload}>Try again</Button></div>
+          <div className="mt-4"><AiNotice message={research.error} code={research.code} onRetry={research.reload} /></div>
         )}
         {research.status === "ready" && (
           <>

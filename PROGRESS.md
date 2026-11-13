@@ -8,7 +8,10 @@ never fabricate data; no fake buttons; keys only in `.env.local` and Vercel; end
 
 ## Project facts
 - Next.js 16.4 (App Router, `cacheComponents` on, `src/` dir), React 19.3, Tailwind 4, Recharts, TypeScript.
-- Next 16 renames middleware to **`src/proxy.ts`** (passcode gate lives there).
+- Next 16 renames middleware to **`src/proxy.ts`**. The passcode gate was REMOVED on Nov 13 at the user's request
+  (site is public; still `robots: noindex`). AI is limited per visitor: `src/lib/server/quota.ts`
+  (10 new AI requests/day per anonymous IP+browser hash; Upstash Redis if `UPSTASH_REDIS_REST_URL/_TOKEN`
+  or `KV_REST_API_URL/_TOKEN` are set, else per-server memory). Cache hits never count.
 - Design tokens in `src/app/globals.css` (`navy`, `blue`, `copper`, `ivory`, `charcoal`, `slate`, ...).
   Fonts: Inter (body) + Source Serif 4 (headings, `font-serif`).
 - Env vars: `DEMO_PASSCODE`, `TIINGO_API_KEY`, `ANTHROPIC_API_KEY`, `SEC_CONTACT_EMAIL`.
